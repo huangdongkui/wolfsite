@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fanhua.wolfsite.modules.sys.dao.SysFileDao">
+
+	<sql id="sysFileColumns">
+		a.id AS "id",
+		a.file_name AS "fileName",
+		a.file_path AS
+		"filePath",
+		a.file_size AS "fileSize",
+		a.file_type AS "fileType",
+		a.bussiness_id AS "bussinessId",
+		a.create_by AS "createBy.id",
+		u.name AS
+		"createBy.name",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		(select label from sys_dict where type='filetype' and value=a.bussnissType) as "bussnissType"
+	</sql>
+
+	<sql id="sysFileJoins">
+	</sql>
+
+	<sql id="leaveJoins">
+		Left JOIN sys_user u ON u.login_name = a.create_by
+	</sql>
+
+	<select id="get" resultType="SysFile">
+		SELECT
+		<include refid="sysFileColumns" />
+		FROM sys_file a
+		<include refid="leaveJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="SysFile">
+		SELECT
+		<include refid="sysFileColumns" />
+		FROM sys_file a
+		<include refid="leaveJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<if test="bussinessId!=null and bussinessId!=''">
+			and a.bussiness_id=#{bussinessId}
+		</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="SysFile">
+		SELECT
+		<include refid="sysFileColumns" />
+		FROM sys_file a
+		<include refid="sysFileJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_file(
+		id,
+		file_name,
+		file_path,
+		file_size,
+		file_type,
+		bussiness_id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		bussnissType
+		) VALUES (
+		#{id},
+		#{fileName},
+		#{filePath},
+		#{fileSize},
+		#{fileType},
+		#{bussinessId},
+		#{createBy.loginName},
+		#{createDate},
+		#{updateBy.loginName},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{bussnissType}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sys_file SET
+		id = #{id},
+		file_name = #{fileName},
+		file_path = #{filePath},
+		file_size = #{fileSize},
+		file_type = #{fileType},
+		bussiness_id = #{bussinessId},
+		update_by = #{updateBy.loginName},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE sys_file SET
+		del_flag = #{DEL_FLAG_DELETE},
+		update_by = #{updateBy.loginName},
+		update_date = now()
+		WHERE id = #{id}
+	</update>
+
+</mapper>

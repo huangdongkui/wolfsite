@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fanhua.wolfsite.modules.project.dao.ProjectInfoDao">
+    
+	<sql id="projectInfoColumns">
+		a.id AS "id",
+		a.project_name AS "projectName",
+		a.project_type AS "projectType",
+		a.project_source AS "projectSource",
+		a.budget_amount AS "budgetAmount",
+		a.need_bid AS "needBid",
+		a.plan_begin_datetime AS "planBeginDatetime",
+		a.client_name AS "clientName",
+		a.client_request_desc AS "clientRequestDesc",
+		a.bid_info AS "bidInfo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.proc_ins_id AS "procInsId"
+	</sql>
+	
+	<sql id="projectInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="ProjectInfo">
+		SELECT 
+			<include refid="projectInfoColumns"/>
+		FROM project_info a
+		<include refid="projectInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProjectInfo">
+		SELECT 
+			<include refid="projectInfoColumns"/>
+		FROM project_info a
+		<include refid="projectInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProjectInfo">
+		SELECT 
+			<include refid="projectInfoColumns"/>
+		FROM project_info a
+		<include refid="projectInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO project_info(
+			id,
+			project_name,
+			project_type,
+			project_source,
+			budget_amount,
+			need_bid,
+			plan_begin_datetime,
+			client_name,
+			client_request_desc,
+			bid_info,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			proc_ins_id
+		) VALUES (
+			#{id},
+			#{projectName},
+			#{projectType},
+			#{projectSource},
+			#{budgetAmount},
+			#{needBid},
+			#{planBeginDatetime},
+			#{clientName},
+			#{clientRequestDesc},
+			#{bidInfo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{procInsId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE project_info SET 	
+			project_name = #{projectName},
+			project_type = #{projectType},
+			project_source = #{projectSource},
+			budget_amount = #{budgetAmount},
+			need_bid = #{needBid},
+			plan_begin_datetime = #{planBeginDatetime},
+			client_name = #{clientName},
+			client_request_desc = #{clientRequestDesc},
+			bid_info = #{bidInfo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE project_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+		<update id="updateInsId">
+		UPDATE project_info SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+</mapper>

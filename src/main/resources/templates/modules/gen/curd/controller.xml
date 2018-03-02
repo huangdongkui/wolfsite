@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>controller</name>
+	<filePath>src/main/java/${packageName}/${moduleName}/web/${subModuleName}</filePath>
+	<fileName>${ClassName}Controller.java</fileName>
+	<content><![CDATA[
+/**
+ * Copyright &copy; 2018-2020 <a href="http://www.cnblogs.com/wolf12/">wolfsite</a> All rights reserved.
+ */
+package ${packageName}.${moduleName}.web<#if subModuleName != "">.${subModuleName}</#if>;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.fanhua.wolfsite.common.config.Global;
+import com.fanhua.wolfsite.common.persistence.Page;
+import com.fanhua.wolfsite.common.web.BaseController;
+import com.fanhua.wolfsite.common.utils.StringUtils;
+import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+import ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Service;
+
+/**
+ * ${functionName}Controller
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+@Controller
+@RequestMapping(value = "${r"${adminPath}"}/${urlPrefix}")
+public class ${ClassName}Controller extends BaseController {
+
+	@Autowired
+	private ${ClassName}Service ${className}Service;
+
+
+ 	@RequestMapping(value = {"list"})
+    public String list() {
+        return "${lastPackageName}/${viewPrefix}List";
+    }
+
+    @RequestMapping(value = {"lists"},method= RequestMethod.GET)
+    @ResponseBody
+    public PageResult lists(${ClassName} ${className}, HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+
+         //解析搜索表单
+        String p_where_string = StringUtils.genWhere(request.getParameter("searchParams"));
+
+        String selectSql="select *,(select name from sys_user where id=create_by) as create_by_name from sys_func where del_flag=0";
+        PageResult pageResult = new PageResult();
+        HashMap hashMap = new HashMap();
+        hashMap.put("p_table_name", selectSql);
+        hashMap.put("p_fields", "*");
+        hashMap.put("p_page_size", request.getParameter("limit"));
+        hashMap.put("p_page_no", request.getParameter("offset"));
+        hashMap.put("p_order_string", "create_date");
+        hashMap.put("p_where_string", p_where_string);
+        pageResult.setRows(${className}Service.listPage(hashMap));
+        return pageResult;
+    }
+
+	@RequestMapping(method=RequestMethod.GET)
+    public String form(${ClassName} ${className}, Model model) {
+        SysFunc entity = null;
+        if (StringUtils.isNotBlank(${className}.getId())) {
+            entity = ${className}Service.get(${className}.getId());
+        }
+        if (entity == null) {
+            entity = new ${ClassName}();
+        }
+        model.addAttribute("sysFunc", entity);
+		return "${lastPackageName}/${viewPrefix}Form";
+    }
+
+	@RequestMapping(method = RequestMethod.POST)
+    @ResponseBody
+    public ResultVo save(${ClassName} ${className}, Model model, RedirectAttributes redirectAttributes) {
+        ResultVo r = new ResultVo();
+      	if (!beanValidator(model, ${className})){
+            return r.error(1, model.asMap().toString());
+        }
+
+        try {
+            ${className}Service.save(${className});
+            return r.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return r.error(1, e.getMessage());
+        }
+
+    }
+
+    @RequestMapping(method =RequestMethod.DELETE)
+    @ResponseBody
+    public ResultVo dalete(${ClassName} ${className}) {
+        ResultVo r = new ResultVo();
+        try {
+            ${className}Service.delete(${className});
+            return r.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return r.error(1, "删除失败");
+        }
+
+    }
+
+}]]>
+	</content>
+</template>

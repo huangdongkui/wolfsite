@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fanhua.wolfsite.modules.sys.dao.SysFuncDao">
+    
+	<sql id="sysFuncColumns">
+		a.id AS "id",
+		a.func_name AS "funcName",
+		a.func_jsmethod AS "funcJsmethod",
+		a.show_type AS "showType",
+		a.icon AS "icon",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u.name as createByName,
+		uu.name as updateByName
+	</sql>
+	
+	<sql id="sysFuncJoins">
+		left join sys_user u on u.id=a.create_by
+		left join sys_user uu on uu.id=a.update_by
+	</sql>
+    
+	<select id="get" resultType="SysFunc">
+		SELECT 
+			<include refid="sysFuncColumns"/>
+		FROM sys_func a
+		<include refid="sysFuncJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysFunc">
+		SELECT 
+			<include refid="sysFuncColumns"/>
+		FROM sys_func a
+		<include refid="sysFuncJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="funcName != null and funcName != ''">
+				AND a.func_name = #{funcName}
+			</if>
+			<if test="funcJsmethod != null and funcJsmethod != ''">
+				AND a.func_jsmethod = #{funcJsmethod}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysFunc">
+		SELECT 
+			<include refid="sysFuncColumns"/>
+		FROM sys_func a
+		<include refid="sysFuncJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_func(
+			id,
+			func_name,
+			func_jsmethod,
+			show_type,
+			icon,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{funcName},
+			#{funcJsmethod},
+			#{showType},
+			#{icon},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_func SET 	
+			func_name = #{funcName},
+			func_jsmethod = #{funcJsmethod},
+			show_type = #{showType},
+			icon = #{icon},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_func SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

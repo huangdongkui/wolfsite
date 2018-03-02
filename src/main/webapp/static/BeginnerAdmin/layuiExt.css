@@ -1,0 +1,9 @@
+﻿.layui-nav-down {
+    top: 20px; right: 10px; margin: 0;
+}
+.layui-nav-down{content:'';width: 0;height: 0;border-style: dashed;border-color: transparent;overflow: hidden;cursor: pointer;transition: all .2s;-webkit-transition: all .2s;}
+.layui-nav-down{position: absolute;border-width: 6px;border-top-style: solid;border-top-color: #fff;border-top-color: rgba(255,255,255,.7);}
+.layui-nav .layui-nav-child dd.layui-this a{background-color: rgba(0,0,0,0.1)!important;}
+.layui-nav-tree .layui-nav-child dd.layui-this a{background-color: rgba(0,0,0,0.1)!important;}
+.layui-nav-child dd.layui-this {background-color: rgba(0,0,0,0.1)!important;}
+.fa{margin-right: 5px; line-height: 35px !important; }
